@@ -1,4 +1,4 @@
-from database import search_news
+from tech_news.database import search_news
 
 
 # Requisito 6
@@ -9,7 +9,7 @@ def search_by_title(title):
     news_list = []
     for news in cursor:
         news_list.append((news["title"], news["url"]))
-    return news
+    return news_list
 
 
 # Requisito 7
