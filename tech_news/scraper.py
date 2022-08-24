@@ -2,6 +2,8 @@ from time import sleep
 from parsel import Selector
 import requests
 
+from tech_news.database import create_news
+
 
 # Requisito 1
 def fetch(url):
@@ -64,6 +66,36 @@ def scrape_noticia(html_content):
     }
 
 
+def get_tech_news_helper(news_link_list, amount):
+    news_list = []
+    length_links_list = len(news_link_list)
+    qty_needed = length_links_list - (length_links_list % amount)
+    news_link_list = news_link_list[:qty_needed]
+    for news_link in news_link_list:
+        news_html = fetch(news_link)
+        news_data = scrape_noticia(news_html)
+        news_list.append(news_data)
+    return news_list
+
+
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    news_list = []
+    url = "https://blog.betrybe.com"
+    while len(news_list) < amount:
+        html_content = fetch(url)
+        news_link_list = scrape_novidades(html_content)
+        # set quantity of news needed in the next request package
+        next_package_needed = len(news_link_list)
+        # if the amount needed is lower then the number of the default
+        # package length
+        if (amount - len(news_list)) < len(news_link_list):
+            # amount from the beginning is alread lower then the package
+            if amount < len(news_link_list):
+                next_package_needed = amount
+            # quantity needed is higher then the default package length
+            else:
+                next_package_needed = amount - len(news_list)
+        news_list += get_tech_news_helper(news_link_list, next_package_needed)
+        url = scrape_next_page_link(html_content)
+    create_news(news_list)
