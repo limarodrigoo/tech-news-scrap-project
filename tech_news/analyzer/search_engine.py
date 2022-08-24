@@ -30,7 +30,10 @@ def search_by_date(date):
 
 # Requisito 8
 def search_by_tag(tag):
-    """Seu código deve vir aqui"""
+    cursor = search_news(
+        {"tags": {"$elemMatch": {"$regex": tag, "$options": "i"}}}
+    )
+    return tuple_builder(cursor)
 
 
 # Requisito 9
